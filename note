@@ -1,0 +1,16 @@
+POST /iframe.ashx?t=ping&callback=jQuery111305132493189017003_1600955943436 HTTP/1.1
+Host: ping.chinaz.com
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0
+Accept: text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*; q=0.01
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+X-Requested-With: XMLHttpRequest
+Content-Length: 126
+Origin: http://ping.chinaz.com
+Connection: close
+Referer: http://ping.chinaz.com/
+
+guid=17d812b5-ced1-4717-8669-51ce10615682&host=baidu.com&ishost=0&isipv6=0&encode=zxvXAfWZuer8pEY3YyErCfPjF~0gqfqG&checktype=0
+
+
