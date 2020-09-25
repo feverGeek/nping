@@ -1,21 +1,20 @@
 '''
 Author: Zeta 
 Date: 2020-09-24 22:45:24
-LastEditTime: 2020-09-25 23:44:56
+LastEditTime: 2020-09-25 23:49:15
 LastEditors: Please set LastEditors
 Description: 异步发包实现多地ping,测试域名ip
 '''
+import re
 import asyncio
 import aiohttp
-import requests
+# import requests
 from requests.models import Response
 import myguids
-import time
-import datetime
-import re
+# import time
+# import datetime
 
 url = 'http://ping.chinaz.com/iframe.ashx?t=ping'
-callbacks = ['jQuery111305132493189017003_1600955943436']
 headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101 Firefox/78.0',
     'Accept': 'text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*; q=0.01',
@@ -25,7 +24,7 @@ headers = {
     'X-Requested-With': 'XMLHttpRequest',
     'Origin': 'http://ping.chinaz.com',
     'Connection': 'close',
-    'Referer': 'http://ping.chinaz.com/baidu.com'
+    'Referer': 'http://ping.chinaz.com/'
 }
 
 
@@ -37,6 +36,7 @@ async def post(url, headers, params, semaphore):
 
 
 def get_ips(responses):
+
     ips = []
     reg = r"{state:.*?,msg:'.*?',result:{ip:'(.*?)',ipaddress:'.*?',responsetime:'.*?',ttl:'.*?',bytes:'.*?'}}"
     pattern = re.compile(reg)
@@ -50,6 +50,8 @@ def get_ips(responses):
 
 
 def nping(host):
+
+    headers['Referer'] = headers['Referer'] + host
     params = 'guid={guid}&host={host}&ishost=0&isipv6=0&encode=zxvXAfWZuer8pEY3YyErCfPjF~0gqfqG&checktype=0'.format(
         guid='{guid}', host=host)
 
