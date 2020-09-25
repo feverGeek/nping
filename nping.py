@@ -1,16 +1,15 @@
 '''
 Author: Zeta 
 Date: 2020-09-24 22:45:24
-LastEditTime: 2020-09-25 23:49:15
+LastEditTime: 2020-09-25 23:54:49
 LastEditors: Please set LastEditors
 Description: 异步发包实现多地ping,测试域名ip
 '''
 import re
 import asyncio
 import aiohttp
-# import requests
-from requests.models import Response
 import myguids
+# import requests
 # import time
 # import datetime
 
