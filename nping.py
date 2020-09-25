@@ -1,15 +1,18 @@
 '''
 Author: Zeta 
 Date: 2020-09-24 22:45:24
-LastEditTime: 2020-09-25 00:31:00
+LastEditTime: 2020-09-25 23:44:56
 LastEditors: Please set LastEditors
 Description: 异步发包实现多地ping,测试域名ip
 '''
 import asyncio
 import aiohttp
 import requests
+from requests.models import Response
 import myguids
 import time
+import datetime
+import re
 
 url = 'http://ping.chinaz.com/iframe.ashx?t=ping'
 callbacks = ['jQuery111305132493189017003_1600955943436']
@@ -20,7 +23,6 @@ headers = {
     'Accept-Encoding': 'gzip, deflate',
     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
     'X-Requested-With': 'XMLHttpRequest',
-    'Content-Length': '126',
     'Origin': 'http://ping.chinaz.com',
     'Connection': 'close',
     'Referer': 'http://ping.chinaz.com/baidu.com'
@@ -30,28 +32,45 @@ headers = {
 async def post(url, headers, params, semaphore):
     async with semaphore:
         async with aiohttp.ClientSession() as session:
-            async with session.post(url, params=params, headers=headers) as response:
+            async with session.post(url, data=params, headers=headers) as response:
                 return await response.read()
 
 
-def main():
-    host = 'baidu.com'
+def get_ips(responses):
+    ips = []
+    reg = r"{state:.*?,msg:'.*?',result:{ip:'(.*?)',ipaddress:'.*?',responsetime:'.*?',ttl:'.*?',bytes:'.*?'}}"
+    pattern = re.compile(reg)
+
+    for response in responses:
+        response = response[1:-1]  # 去掉响应中的括号
+        ip = pattern.findall(response)[0]
+        ips.append(ip)
+
+    return ips
+
+
+def nping(host):
     params = 'guid={guid}&host={host}&ishost=0&isipv6=0&encode=zxvXAfWZuer8pEY3YyErCfPjF~0gqfqG&checktype=0'.format(
         guid='{guid}', host=host)
-    # semaphore = asyncio.Semaphore(20)  # 限制并发数10
-    # loop = asyncio.get_event_loop()
-    # tasks = []
-    # for callback in callbacks:
-    #     task = asyncio.ensure_future(
-    #         post(url.format(callback), headers, params, semaphore))
-    #     tasks.append(task)
-    # results = loop.run_until_complete(asyncio.gather(*tasks))
-    # print(results)
-    # loop.close()
+
+    tasks = []
+    semaphore = asyncio.Semaphore(20)  # 限制并发数20
+    loop = asyncio.get_event_loop()
+    # time1 = datetime.datetime.now()
     for guid in myguids.guids:
-        r = requests.post(url, headers=headers, data=params.format(guid=guid))
-        print(r.text)
+        task = asyncio.ensure_future(
+            post(url, headers, params.format(guid=guid), semaphore))
+        tasks.append(task)
+        # print(params.format(guid=guid))
+    responses = loop.run_until_complete(asyncio.gather(*tasks))
+    # time2 = datetime.datetime.now()
+    # print("delta time: %d" % ((time2 - time1).seconds))
+    loop.close()
+
+    ips = get_ips(responses)
+    return ips
 
 
 if __name__ == "__main__":
-    main()
+    host = 'baidu.com'
+    ips = nping(host)
